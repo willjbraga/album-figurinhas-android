@@ -1,2 +1,2 @@
-# album-figurinhas-android
-Álbum de figurinhas digital em Kotlin/Android com Jetpack Compose, MVVM, navegação entre telas e dados remotos.
+# hallthefame-championsleague-android
+Aplicativo móvel para visualização de informações históricas, estatísticas e perfis dos principais clubes e jogadores da UEFA Champions League. Desenvolvido em Kotlin/Android com Jetpack Compose, MVVM, navegação entre telas e dados remotos.
