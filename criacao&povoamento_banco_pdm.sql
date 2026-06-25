@@ -1,4 +1,4 @@
- create table times(
+create table times(
 id integer primary key,
 nome varchar(50),
 sigla varchar(3),

@@ -10,6 +10,8 @@ import androidx.room.PrimaryKey
         ])
 )
 
+.addTypeConverter(...)
+
 data class Jogadores(
     @PrimaryKey
     val nome: String,
