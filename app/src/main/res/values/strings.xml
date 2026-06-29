@@ -1,0 +1,94 @@
+<!-- ════════════════════════════════════════════════════════════════════════
+     res/values/strings.xml
+     ════════════════════════════════════════════════════════════════════════ -->
+<resources>
+    <string name="app_name">Álbum Champions</string>
+    <string name="competition_name">UEFA Champions League</string>
+    <string name="teams_section">Equipes Participantes</string>
+    <string name="coach_label">Treinador</string>
+    <string name="players_label">Jogadores</string>
+    <string name="star_player_label">⭐ Jogador Destaque</string>
+    <string name="titles_label">títulos</string>
+    <string name="matches_label">Partidas</string>
+    <string name="goals_label">Gols</string>
+    <string name="assists_label">Assistências</string>
+    <string name="history_label">História</string>
+    <string name="curiosity_label">Curiosidade</string>
+    <string name="profile_label">Perfil</string>
+    <string name="about_label">Sobre</string>
+    <string name="stats_label">Estatísticas</string>
+    <string name="back">Voltar</string>
+    <string name="loading">Carregando...</string>
+</resources>
+
+
+    <!-- ════════════════════════════════════════════════════════════════════════
+         REFERÊNCIA DE DRAWABLES (res/drawable/)
+         Nomes que você deve usar ao adicionar as imagens ao projeto
+         ════════════════════════════════════════════════════════════════════════
+
+         TROFÉU
+         ──────
+         trofeu.png                      → troféu UEFA Champions League
+
+         ESCUDOS DE TIMES
+         ────────────────
+         escudo_real_madrid.png
+         escudo_barcelona.png
+         escudo_psg.png
+         escudo_milan.png
+         escudo_bayern.png
+
+         FOTOS DE TREINADORES
+         ─────────────────────
+         treinador_mourinho.png
+         treinador_flick.png
+         treinador_luisenrique.png
+         treinador_amorim.png
+         treinador_kompany.png
+
+         FOTOS DE JOGADORES – Real Madrid
+         ──────────────────────────────────
+         jogador_vinicius.png
+         jogador_mbappe.png
+         jogador_bellingham.png
+         jogador_valverde.png
+         jogador_courtois.png
+
+         FOTOS DE JOGADORES – Barcelona
+         ────────────────────────────────
+         jogador_raphinha.png
+         jogador_yamal.png
+         jogador_lewandowski.png
+         jogador_pedri.png
+         jogador_terstegen.png
+
+         FOTOS DE JOGADORES – PSG
+         ─────────────────────────
+         jogador_dembele.png
+         jogador_kvaratskhelia.png
+         jogador_vitinha.png
+         jogador_marquinhos.png
+         jogador_safonov.png
+
+         FOTOS DE JOGADORES – Milan
+         ────────────────────────────
+         jogador_leao.png
+         jogador_pulisic.png
+         jogador_modric.png
+         jogador_maignan.png
+         jogador_rabiot.png
+
+         FOTOS DE JOGADORES – Bayern
+         ─────────────────────────────
+         jogador_kane.png
+         jogador_luisdiaz.png
+         jogador_olise.png
+         jogador_kimmich.png
+         jogador_neuer.png
+
+         DICA: Coloque todas as imagens como PNG ou WebP
+         diretamente em res/drawable/
+         Após adicionar, o R.drawable.<nome> fica disponível
+         automaticamente no código.
+         ════════════════════════════════════════════════════════════════════════ -->
