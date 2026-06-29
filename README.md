@@ -8,16 +8,16 @@ a mesma coisa para outras imagens que forem colocadas em telas de fundo que não
 Abaixo é uma referência para o nome das imagens que precisam ser colocadas na pasta 'res/drawable/'
 
 
-<!--  ════════════════════════════════════════════════════════════════════════
+════════════════════════════════════════════════════════════════════════
      REFERÊNCIA DE DRAWABLES (res/drawable/)
      Nomes que você deve usar ao adicionar as imagens ao projeto
      ════════════════════════════════════════════════════════════════════════
 
-     TROFÉU
+ TROFÉU
      ──────
      trofeu.png                      → troféu UEFA Champions League
 
-     ESCUDOS DE TIMES
+ ESCUDOS DE TIMES
      ────────────────
      escudo_real_madrid.png
      escudo_barcelona.png
@@ -25,7 +25,7 @@ Abaixo é uma referência para o nome das imagens que precisam ser colocadas na 
      escudo_milan.png
      escudo_bayern.png
 
-     FOTOS DE TREINADORES
+FOTOS DE TREINADORES
      ─────────────────────
      treinador_mourinho.png
      treinador_flick.png
@@ -33,7 +33,7 @@ Abaixo é uma referência para o nome das imagens que precisam ser colocadas na 
      treinador_amorim.png
      treinador_kompany.png
 
-     FOTOS DE JOGADORES – Real Madrid
+ FOTOS DE JOGADORES – Real Madrid
      ──────────────────────────────────
      jogador_vinicius.png
      jogador_mbappe.png
@@ -41,7 +41,7 @@ Abaixo é uma referência para o nome das imagens que precisam ser colocadas na 
      jogador_valverde.png
      jogador_courtois.png
 
-     FOTOS DE JOGADORES – Barcelona
+ FOTOS DE JOGADORES – Barcelona
      ────────────────────────────────
      jogador_raphinha.png
      jogador_yamal.png
@@ -49,7 +49,7 @@ Abaixo é uma referência para o nome das imagens que precisam ser colocadas na 
      jogador_pedri.png
      jogador_terstegen.png
 
-     FOTOS DE JOGADORES – PSG
+FOTOS DE JOGADORES – PSG
      ─────────────────────────
      jogador_dembele.png
      jogador_kvaratskhelia.png
@@ -57,7 +57,7 @@ Abaixo é uma referência para o nome das imagens que precisam ser colocadas na 
      jogador_marquinhos.png
      jogador_safonov.png
 
-     FOTOS DE JOGADORES – Milan
+   FOTOS DE JOGADORES – Milan
      ────────────────────────────
      jogador_leao.png
      jogador_pulisic.png
@@ -65,7 +65,7 @@ Abaixo é uma referência para o nome das imagens que precisam ser colocadas na 
      jogador_maignan.png
      jogador_rabiot.png
 
-     FOTOS DE JOGADORES – Bayern
+ FOTOS DE JOGADORES – Bayern
      ─────────────────────────────
      jogador_kane.png
      jogador_luisdiaz.png
@@ -73,8 +73,8 @@ Abaixo é uma referência para o nome das imagens que precisam ser colocadas na 
      jogador_kimmich.png
      jogador_neuer.png
 
-     DICA: Coloque todas as imagens como PNG ou WebP
+  Coloque todas as imagens como PNG ou WebP
      diretamente em res/drawable/
      Após adicionar, o R.drawable.<nome> fica disponível
      automaticamente no código.
-     ════════════════════════════════════════════════════════════════════════  -->
+     ════════════════════════════════════════════════════════════════════════  
