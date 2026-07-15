@@ -1,5 +1,4 @@
-A implementação do banco remoto precisa mexer na parte de 'Data' do projeto, além disso o 'Data/mock' vai ser excluído assim que a implementação do banco for feita, ela ta sendo usada só para testar o visual básico do aplicativo e verificar se o fluxo das telas se está funcionando.
-Detalhe importante é que além dos atributos definidos pelo banco as data class 'coach', 'competition' e 'team' possuem um id para a foto que é 'R.drawable.nome_da_foto', esse valor tem q ser definido diretamente no código já que esse id não vem do banco.
+
 
 
 A parte do design das telas basicamente vai mexer na pasta 'ui', nele tem as telas e os cards clicáveis do jogador estrela, jogador normal e técnico que são usados na tela do álbum do time,
