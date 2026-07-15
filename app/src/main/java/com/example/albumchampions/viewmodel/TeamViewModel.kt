@@ -36,21 +36,38 @@ class TeamViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
+
     fun loadTeam(teamId: Int) {
+        _error.value = null
+        _isLoading.value = true
+
         viewModelScope.launch {
-            _isLoading.value = true
-            teamRepository.getTeamById(teamId).collect { _team.value = it }
+            try {
+                teamRepository.getTeamById(teamId).collect { _team.value = it }
+            } catch (e: Exception) {
+                _error.value = "Erro ao carregar time: ${e.message}"
+            }
         }
         viewModelScope.launch {
-            playerRepository.getPlayersByTeam(teamId).collect { list ->
-                _players.value = list
-                _starPlayer.value = list.find { it.estrela }
+            try {
+                playerRepository.getPlayersByTeam(teamId).collect { list ->
+                    _players.value = list
+                    _starPlayer.value = list.find { it.estrela }
+                    _isLoading.value = false
+                }
+            } catch (e: Exception) {
+                _error.value = "Erro ao carregar jogadores: ${e.message}"
                 _isLoading.value = false
             }
         }
         viewModelScope.launch {
-            coachRepository.getCoachByTeam(teamId).collect { _coach.value = it }
+            try {
+                coachRepository.getCoachByTeam(teamId).collect { _coach.value = it }
+            } catch (e: Exception) {
+                _error.value = "Erro ao carregar treinador: ${e.message}"
+            }
         }
     }
 }
-

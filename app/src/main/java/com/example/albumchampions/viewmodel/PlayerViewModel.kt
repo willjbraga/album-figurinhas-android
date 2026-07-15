@@ -1,4 +1,3 @@
-
 // ─────────────────────────────────────────────────────────────────────────────
 // viewmodel/PlayerViewModel.kt
 // ─────────────────────────────────────────────────────────────────────────────
@@ -25,15 +24,34 @@ class PlayerViewModel(
     private val _team = MutableStateFlow<Team?>(null)
     val team: StateFlow<Team?> = _team
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
+
     fun loadPlayer(playerName: String) {
+        _error.value = null
+        _isLoading.value = true
+
         viewModelScope.launch {
-            playerRepository.getPlayerByName(playerName).collect { p ->
-                _player.value = p
-                p?.let {
-                    teamRepository.getTeamById(it.idTime).collect { t ->
-                        _team.value = t
+            try {
+                playerRepository.getPlayerByName(playerName).collect { p ->
+                    _player.value = p
+                    if (p != null) {
+                        try {
+                            teamRepository.getTeamById(p.idTime).collect { t ->
+                                _team.value = t
+                            }
+                        } catch (e: Exception) {
+                            _error.value = "Erro ao carregar time do jogador: ${e.message}"
+                        }
                     }
+                    _isLoading.value = false
                 }
+            } catch (e: Exception) {
+                _error.value = "Erro ao carregar jogador: ${e.message}"
+                _isLoading.value = false
             }
         }
     }

@@ -27,23 +27,34 @@ class CompetitionViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
+
     init {
         loadData()
     }
 
-    private fun loadData() {
+    fun loadData() {
+        _error.value = null
+        _isLoading.value = true
+
         viewModelScope.launch {
-            _isLoading.value = true
-            competitionRepository.getCompetition().collect { _competition.value = it }
+            try {
+                competitionRepository.getCompetition().collect { _competition.value = it }
+            } catch (e: Exception) {
+                _error.value = "Erro ao carregar competição: ${e.message}"
+            }
         }
         viewModelScope.launch {
-            teamRepository.getAllTeams().collect {
-                _teams.value = it
+            try {
+                teamRepository.getAllTeams().collect {
+                    _teams.value = it
+                    _isLoading.value = false
+                }
+            } catch (e: Exception) {
+                _error.value = "Erro ao carregar times: ${e.message}"
                 _isLoading.value = false
             }
         }
     }
 }
-
-
-

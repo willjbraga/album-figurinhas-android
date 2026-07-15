@@ -1,4 +1,3 @@
-
 // ─────────────────────────────────────────────────────────────────────────────
 // viewmodel/CoachViewModel.kt
 // ─────────────────────────────────────────────────────────────────────────────
@@ -25,15 +24,34 @@ class CoachViewModel(
     private val _team = MutableStateFlow<Team?>(null)
     val team: StateFlow<Team?> = _team
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
+
     fun loadCoach(teamId: Int) {
+        _error.value = null
+        _isLoading.value = true
+
         viewModelScope.launch {
-            coachRepository.getCoachByTeam(teamId).collect { c ->
-                _coach.value = c
-                c?.let {
-                    teamRepository.getTeamById(it.idTime).collect { t ->
-                        _team.value = t
+            try {
+                coachRepository.getCoachByTeam(teamId).collect { c ->
+                    _coach.value = c
+                    if (c != null) {
+                        try {
+                            teamRepository.getTeamById(c.idTime).collect { t ->
+                                _team.value = t
+                            }
+                        } catch (e: Exception) {
+                            _error.value = "Erro ao carregar time do treinador: ${e.message}"
+                        }
                     }
+                    _isLoading.value = false
                 }
+            } catch (e: Exception) {
+                _error.value = "Erro ao carregar treinador: ${e.message}"
+                _isLoading.value = false
             }
         }
     }

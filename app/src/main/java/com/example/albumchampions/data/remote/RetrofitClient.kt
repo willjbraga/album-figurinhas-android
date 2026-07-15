@@ -3,7 +3,9 @@
 // ─────────────────────────────────────────────
 package com.example.albumchampions.data.remote
 
-import com.google.firebase.appdistribution.gradle.ApiService
+//import com.google.firebase.appdistribution.gradle.ApiService
+
+import com.example.albumchampions.data.remote.ApiService
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -14,11 +16,11 @@ object RetrofitClient {
 
     // ── Configuração ──────────────────────────────────────────────────────────
 
-    private const val BASE_URL = "https://cnpvzcsdedlksbbuqyti.supabase.co/rest/v1/"
+    private const val BASE_URL = "https://abtemnjmeoxgxqusemic.supabase.co/rest/v1/"
 
     // Chave pública (anon key):
     // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNucHZ6Y3NkZWRsa3NiYnVxeXRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5NjQzNDEsImV4cCI6MjA5OTU0MDM0MX0.2UPq6JSg-0Uds0DTta4_cQZQjA5Hrq1ol2AqEx8NHcs
-    private const val SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNucHZ6Y3NkZWRsa3NiYnVxeXRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5NjQzNDEsImV4cCI6MjA5OTU0MDM0MX0.2UPq6JSg-0Uds0DTta4_cQZQjA5Hrq1ol2AqEx8NHcs"
+    private const val SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFidGVtbmptZW94Z3hxdXNlbWljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwOTMyNDQsImV4cCI6MjA5OTY2OTI0NH0.W-9LfSFCL5HdUytXcoxhqloT0QT806s8YZSQnlx9Irs"
 
     // ── Interceptor de headers ────────────────────────────────────────────────
 
