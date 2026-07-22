@@ -1,4 +1,3 @@
-
 // ─────────────────────────────────────────────
 // data/model/Coach.kt
 // ─────────────────────────────────────────────
@@ -9,5 +8,6 @@ data class Coach(
     val perfil: String,
     val pais: String,
     val idTime: Int,
-    val fotoResId: Int            // R.drawable.treinador_mourinho, etc.
+    val fotoResId: Int,
+    val idioma: String
 )

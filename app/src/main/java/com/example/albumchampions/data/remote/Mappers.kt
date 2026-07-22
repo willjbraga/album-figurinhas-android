@@ -13,15 +13,26 @@ fun TeamDto.toTeam() = Team(
 )
 
 fun PlayerDto.toPlayer() = Player(
-    nome = nome, estrela = estrela, pais = pais,
-    numCamisa = numCamisa, partidas = partidas, gols = gols,
-    assistencia = assistencia, sobre = sobre, idTime = idTime,
-    fotoResId = FotoMap.jogadorFoto(nome)
+    nome = nome,
+    estrela = estrela,
+    pais = pais,
+    numCamisa = numCamisa,
+    partidas = partidas,
+    gols = gols,
+    assistencia = assistencia,
+    sobre = sobre,
+    idTime = idTime,
+    fotoResId = FotoMap.jogadorFoto(nome),
+    posicao = "ATACANTE"
 )
 
 fun CoachDto.toCoach() = Coach(
-    nome = nome, perfil = perfil, pais = pais,
-    idTime = idTime, fotoResId = FotoMap.treinadorFoto(nome)
+    nome = nome,
+    perfil = perfil,
+    pais = pais,
+    idTime = idTime,
+    fotoResId = FotoMap.treinadorFoto(nome),
+    idioma = "Alemão"
 )
 
 fun CompetitionDto.toCompetition() = Competition(
