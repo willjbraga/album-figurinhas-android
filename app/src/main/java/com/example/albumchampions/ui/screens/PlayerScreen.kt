@@ -4,6 +4,12 @@
 // ═════════════════════════════════════════════════════════════════════════════
 package com.example.albumchampions.ui.screens
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -49,33 +55,44 @@ fun PlayerScreen(
     val primaryColor = team?.corPrimaria?.toComposeColor() ?: Color(0xFF1A237E)
     val secondaryColor = team?.corSecundaria?.toComposeColor() ?: Color(0xFF0A0E27)
 
-    // A etiqueta da camisa continua precisando checar a luminância pois o fundo dela é a cor primária
     val corTextoCamisa = if (primaryColor.luminance() > 0.5f) Color(0xFF0A0E27) else Color.White
 
     var isFavorite by remember { mutableStateOf(false) }
+
+    // ─── LÓGICA DE ANIMAÇÃO (AURA) ──────────────────────────────────────────
+    // Cria a transição infinita para os jogadores destaque
+    val infiniteTransition = rememberInfiniteTransition(label = "aura")
+    val auraAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.2f, // Brilho mais fraco
+        targetValue = 0.6f,  // Brilho mais forte
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 3500, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "auraAlpha"
+    )
+    // ─────────────────────────────────────────────────────────────────────────
 
     player?.let { p ->
         // Degradê Dourado Sofisticado para o Card da Estrela
         val fundoDaFigurinha = if (p.estrela) {
             Brush.linearGradient(
                 colors = listOf(
-                    Color(0xFFD4AF37), // Dourado clássico
-                    Color(0xFFFFDF73), // Brilho suave
-                    Color(0xFFDAA520)  // Ouro velho
+                    Color(0xFFD4AF37),
+                    Color(0xFFFFDF73),
+                    Color(0xFFDAA520)
                 )
             )
         } else {
             SolidColor(Color.White)
         }
 
-        // Box principal que segura o fundo e o esmaecimento
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(secondaryColor) // Cor base do time
+                .background(secondaryColor)
         ) {
             // CAMADA DE ESMAECIMENTO (Overlay escuro)
-            // Se for estrela, escurecemos um pouco mais para o brilho dourado destacar
             val alphaOverlay = if (p.estrela) 0.75f else 0.65f
             Box(
                 modifier = Modifier
@@ -83,21 +100,23 @@ fun PlayerScreen(
                     .background(Color.Black.copy(alpha = alphaOverlay))
             )
 
-            // Brilho/Aura dourada no fundo APENAS para jogadores destaque
+            // BRILHO DOURADO ANIMADO (Apenas para jogadores destaque)
             if (p.estrela) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
                             Brush.radialGradient(
-                                colors = listOf(Color(0x44FFD700), Color.Transparent),
+                                colors = listOf(
+                                    Color(0xFFFFD700).copy(alpha = auraAlpha), // <-- Usa o alpha animado aqui!
+                                    Color.Transparent
+                                ),
                                 radius = 1200f
                             )
                         )
                 )
             }
 
-            // O conteúdo da tela vem por cima de todas as camadas de fundo
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -137,7 +156,6 @@ fun PlayerScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // CARD DO JOGADOR
                     Box(
                         modifier = Modifier
                             .width(150.dp)
@@ -152,12 +170,12 @@ fun PlayerScreen(
                             contentScale = ContentScale.Crop
                         )
 
-                        // ESTRELA NO CANTO SUPERIOR DIREITO (Apenas se for destaque)
+                        // Estrela no canto
                         if (p.estrela) {
                             Icon(
                                 imageVector = Icons.Filled.Star,
                                 contentDescription = "Jogador Destaque",
-                                tint = Color(0xFFB8860B), // Dourado mais fechado para contrastar com o fundo
+                                tint = Color(0xFFB8860B),
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
                                     .padding(8.dp)
@@ -188,7 +206,7 @@ fun PlayerScreen(
                     Column {
                         Text(
                             text = p.nome.uppercase(),
-                            color = Color.White, // Graças ao esmaecimento, sempre fica bom!
+                            color = Color.White,
                             fontSize = 22.sp,
                             fontWeight = FontWeight.ExtraBold,
                             lineHeight = 26.sp
