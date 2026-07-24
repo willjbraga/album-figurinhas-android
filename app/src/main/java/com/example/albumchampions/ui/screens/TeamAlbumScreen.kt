@@ -37,6 +37,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.albumchampions.data.model.Coach
 import com.example.albumchampions.data.model.Player
 import com.example.albumchampions.viewmodel.TeamViewModel
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import com.example.albumchampions.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,6 +71,16 @@ fun TeamAlbumScreen(
         "psg" -> Color(0xFF4C0E0A)            // Ex: Azul escuro PSG
         else -> team?.corSecundaria?.toComposeColor() ?: Color(0xFF03071E) // Cor padrão caso não seja nenhum dos acima
     }
+
+    val FrauncesFont = FontFamily(
+        Font(R.font.fraunces_72pt_semibold)
+    )
+    val FrauncesFontL = FontFamily(
+        Font(R.font.fraunces_72pt_light)
+    )
+    val FrauncesFontR = FontFamily(
+        Font(R.font.fraunces_72pt_regular)
+    )
 
     Scaffold(
         topBar = {
@@ -138,6 +151,7 @@ fun TeamAlbumScreen(
                             text = team?.nome?.uppercase() ?: "",
                             color = Color.White,
                             fontSize = 22.sp,
+                            fontFamily = com.example.albumchampions.ui.screens.FrauncesFont,
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.sp
                         )
@@ -145,6 +159,7 @@ fun TeamAlbumScreen(
                             text = "${team?.numVitoria ?: 0} TÍTULOS",
                             color = Color.White.copy(alpha = 0.8f),
                             fontSize = 15.sp,
+                            fontFamily = com.example.albumchampions.ui.screens.FrauncesFontL,
                             fontWeight = FontWeight.Normal,
                             modifier = Modifier.padding(top = 2.dp)
                         )
@@ -153,6 +168,7 @@ fun TeamAlbumScreen(
                             text = "SAIBA MAIS",
                             color = Color.White,
                             fontSize = 12.sp,
+                            fontFamily = com.example.albumchampions.ui.screens.FrauncesFontL,
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.sp,
                             modifier = Modifier
@@ -169,6 +185,7 @@ fun TeamAlbumScreen(
                     text = "TREINADOR",
                     color = Color.White,
                     fontSize = 15.sp,
+                    fontFamily = com.example.albumchampions.ui.screens.FrauncesFontR,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp,
                     modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
@@ -186,6 +203,7 @@ fun TeamAlbumScreen(
                     text = "JOGADORES",
                     color = Color.White,
                     fontSize = 15.sp,
+                    fontFamily = com.example.albumchampions.ui.screens.FrauncesFont,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp,
                     modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
@@ -221,6 +239,7 @@ fun TeamAlbumScreen(
                         text = "JOGADOR ESTRELA",
                         color = Color.White.copy(alpha = 0.8f),
                         fontSize = 12.sp,
+                        fontFamily = com.example.albumchampions.ui.screens.FrauncesFont,
                         fontWeight = FontWeight.Normal,
                         letterSpacing = 1.sp
                     )
@@ -262,13 +281,15 @@ private fun CoachCardCustom(coach: Coach, onClick: () -> Unit) {
                     text = coach.nome.uppercase(),
                     color = Color.Black,
                     fontSize = 15.sp,
+                    fontFamily = FrauncesFont,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "🇩🇪 ${coach.pais.uppercase()}",
+                    text = "${getCountryFlag(coach.pais)} ${coach.pais.uppercase()}",
                     color = Color.Black,
                     fontSize = 13.sp,
+                    fontFamily = FrauncesFont,
                     fontWeight = FontWeight.Normal
                 )
             }
@@ -327,6 +348,7 @@ private fun PlayerGridCard(
                         text = "${player.numCamisa}",
                         color = Color.White,
                         fontSize = 11.sp,
+                        fontFamily = FrauncesFont,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -358,11 +380,29 @@ private fun PlayerGridCard(
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
+                    fontFamily = FrauncesFont,
                     maxLines = 2,
                     lineHeight = 11.sp
                 )
             }
         }
+    }
+}
+
+
+
+private fun getCountryFlag(countryName: String): String {
+    return when (countryName.lowercase().trim()) {
+        "alemanha" -> "🇩🇪"
+        "espanha" -> "🇪🇸"
+        "portugal" -> "🇵🇹"
+        "itália", "italia" -> "🇮🇹"
+        "frança", "franca" -> "🇫🇷"
+        "inglaterra" -> "🏴󠁧󠁢󠁥󠁮󠁧󠁿"
+        "brasil" -> "🇧🇷"
+        "argentina" -> "🇦🇷"
+        "holanda", "países baixos" -> "🇳🇱"
+        else -> "🏳️"
     }
 }
 
