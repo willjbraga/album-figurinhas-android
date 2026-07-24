@@ -1,25 +1,22 @@
-// ═════════════════════════════════════════════════════════════════════════════
-// ui/screens/HomeScreen.kt
-// Tela Inicial – mostra a competição e a lista de times
-// ═════════════════════════════════════════════════════════════════════════════
 package com.example.albumchampions.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -28,6 +25,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.albumchampions.R
 import com.example.albumchampions.data.model.Team
 import com.example.albumchampions.viewmodel.CompetitionViewModel
+
+val FrauncesFont = FontFamily(
+    Font(R.font.fraunces_72pt_semibold) //
+)
+val FrauncesFontL = FontFamily(
+    Font(R.font.fraunces_72pt_light) //
+)
+val FrauncesFontR = FontFamily(
+    Font(R.font.fraunces_72pt_regular) //
+)
 
 @Composable
 fun HomeScreen(
@@ -38,143 +45,147 @@ fun HomeScreen(
     val teams by viewModel.teams.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    LazyColumn(
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(3), // 3 colunas como na imagem
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0A0E27)),  // fundo escuro Champions
-        contentPadding = PaddingValues(bottom = 24.dp)
+            .background(Color(0xFF03071E)), // Azul escuro profundo
+        contentPadding = PaddingValues(bottom = 32.dp, start = 12.dp, end = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        // ── Header da competição ──────────────────────────────────────────
-        item {
-            Box(
+        // ── Header da competição (ocupa as 3 colunas) ──────────────────────
+        item(span = { GridItemSpan(3) }) {
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(280.dp)
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(Color(0xFF1A237E), Color(0xFF0A0E27))
-                        )
-                    ),
-                contentAlignment = Alignment.Center
+                    .padding(top = 36.dp, bottom = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    // Troféu – substitua R.drawable.trofeu pelo nome do seu arquivo
-                 //   Image(
-                   //     painter = painterResource(id = R.drawable.trofeu),
-                   //     contentDescription = "Troféu UEFA Champions League",
-                   //     modifier = Modifier.size(120.dp),
-                   //     contentScale = ContentScale.Fit
-                //    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = competition?.nome ?: "UEFA Champions League",
-                        color = Color(0xFFFFD700),
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
-                    )
-                    Text(
-                        text = "Edição ${competition?.anoCompeticao ?: ""}",
-                        color = Color.White.copy(alpha = 0.8f),
-                        fontSize = 14.sp
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "${competition?.estadio ?: ""} • ${competition?.cidadeSede ?: ""}",
-                        color = Color.White.copy(alpha = 0.6f),
-                        fontSize = 12.sp
-                    )
-                }
+                Text(
+                    text = "ÁLBUM DE FIGURINHAS",
+                    color = Color.White.copy(alpha = 0.9f),
+                    fontSize = 16.sp,
+                    fontFamily = FrauncesFont,
+                    fontWeight = FontWeight.Medium,
+                    letterSpacing = 2.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .padding(top = 34.dp)
+                )
+
+                Text(
+                    text = "CHAMPIONS\nLEAGUE",
+                    color = Color.White,
+                    fontSize = 25.sp,
+                    fontFamily = FrauncesFont,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.5.sp,
+                    lineHeight = 28.sp,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Text(
+                    text = competition?.anoCompeticao ?: "2025/2026",
+                    color = Color.White.copy(alpha = 0.9f),
+                    fontSize = 25.sp,
+                    fontFamily = FrauncesFont,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // Imagem do Troféu
+                // Certifique-se de ter a imagem 'trofeu' em res/drawable
+                Image(
+                    painter = painterResource(id = R.drawable.trofeu),
+                    contentDescription = "Troféu UEFA Champions League",
+                    modifier = Modifier
+                        .size(280.dp)
+                        .offset(x = 10.dp),
+                    contentScale = ContentScale.Fit
+                )
+
+                Spacer(modifier = Modifier.height(18.dp))
+
+                // Título da Seção
+                Text(
+                    text = "EQUIPES PARTICIPANTES",
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    fontFamily = FrauncesFontR,
+                    fontWeight = FontWeight.SemiBold,
+                    letterSpacing = 1.5.sp,
+                    textAlign = TextAlign.Center
+                )
             }
         }
 
-        // ── Título da seção ───────────────────────────────────────────────
-        item {
-            Text(
-                text = "Equipes Participantes",
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
-            )
-        }
-
-        // ── Lista de cards de times ───────────────────────────────────────
+        // ── Lista de Times em Grade ───────────────────────────────────────
         if (isLoading) {
-            item {
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = Color(0xFFFFD700))
+            item(span = { GridItemSpan(3) }) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = Color.White)
                 }
             }
         } else {
             items(teams) { team ->
-                TeamCard(team = team, onClick = { onTeamClick(team.id) })
+                TeamGridItem(team = team, onClick = { onTeamClick(team.id) })
             }
         }
     }
 }
 
-// ── Card de time ──────────────────────────────────────────────────────────────
+// ── Item de Time da Grade ──────────────────────────────────────────────────
 @Composable
-fun TeamCard(team: Team, onClick: () -> Unit) {
-    Card(
+fun TeamGridItem(team: Team, onClick: () -> Unit) {
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1C2151))
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Escudo
-            Image(
-                painter = painterResource(id = team.escudoResId),
-                contentDescription = "Escudo ${team.nome}",
-               modifier = Modifier
-                    .size(60.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Fit
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            // Info
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = team.nome,
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = team.pais,
-                    color = Color.White.copy(alpha = 0.6f),
-                    fontSize = 13.sp
-                )
-            }
-            // Vitórias
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "${team.numVitoria}",
-                    color = Color(0xFFFFD700),
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.ExtraBold
-                )
-                Text(
-                    text = if (team.numVitoria == 1) "título" else "títulos",
-                    color = Color.White.copy(alpha = 0.6f),
-                    fontSize = 11.sp
-                )
-            }
-        }
+        // Nome do Time (Topo)
+        Text(
+            text = team.nome.uppercase(),
+            color = Color.White,
+            fontSize = 12.sp,
+            fontFamily = FrauncesFontL,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            maxLines = 2,
+            minLines = 2,
+            lineHeight = 13.sp
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Escudo do Time (Centro)
+        Image(
+            painter = painterResource(id = team.escudoResId),
+            contentDescription = "Escudo ${team.nome}",
+            modifier = Modifier.size(68.dp),
+            contentScale = ContentScale.Fit
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Quantidade de Títulos (Baixo)
+        Text(
+            text = "${team.numVitoria} TÍTULOS",
+            color = Color.White.copy(alpha = 0.8f),
+            fontFamily = FrauncesFont,
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Medium,
+            textAlign = TextAlign.Center
+        )
     }
 }
-
-
-
-
-
-
