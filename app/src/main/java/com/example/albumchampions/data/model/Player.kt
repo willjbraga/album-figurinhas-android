@@ -15,5 +15,4 @@ data class Player(
     val sobre: String,
     val idTime: Int,
     val fotoResId: Int,            // R.drawable.jogador_vinicius, etc.
-    val posicao: String
 )

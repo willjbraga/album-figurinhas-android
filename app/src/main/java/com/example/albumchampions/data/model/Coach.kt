@@ -9,5 +9,4 @@ data class Coach(
     val pais: String,
     val idTime: Int,
     val fotoResId: Int,
-    val idioma: String
 )

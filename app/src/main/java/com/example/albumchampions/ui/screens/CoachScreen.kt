@@ -4,6 +4,13 @@
 // ═════════════════════════════════════════════════════════════════════════════
 package com.example.albumchampions.ui.screens
 
+import android.content.Context
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,9 +28,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -31,6 +38,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.albumchampions.data.remote.FotoMap
 import com.example.albumchampions.viewmodel.CoachViewModel
+import kotlinx.coroutines.delay
+import androidx.core.content.edit
 
 @Composable
 fun CoachScreen(
@@ -46,9 +55,43 @@ fun CoachScreen(
     val primaryColor = team?.corPrimaria?.toComposeColor() ?: Color(0xFF1A237E)
     val secondaryColor = team?.corSecundaria?.toComposeColor() ?: Color(0xFF0A0E27)
 
-    val corTextoPrincipal = if (secondaryColor.luminance() > 0.5f) Color(0xFF0A0E27) else Color.White
+    // ─── MEMÓRIA LOCAL PARA FAVORITOS (SharedPreferences) ────────────────────
+    val context = LocalContext.current
+    val sharedPreferences = remember { context.getSharedPreferences("AlbumPrefs", Context.MODE_PRIVATE) }
+    var isFavorite by remember {
+        mutableStateOf(sharedPreferences.getBoolean("fav_coach_$teamId", false))
+    }
 
-    var isFavorite by remember { mutableStateOf(false) }
+    // ─── ESTADOS DE ANIMAÇÃO DE ENTRADA ──────────────────────────────────────
+    var startAnimation by remember { mutableStateOf(false) }
+
+    LaunchedEffect(coach, team) {
+        if (coach != null && team != null) {
+            delay(150)
+            startAnimation = true
+        }
+    }
+
+    val slideOffset by animateDpAsState(
+        targetValue = if (startAnimation) 0.dp else 50.dp,
+        animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing),
+        label = "slideAnim"
+    )
+    val fadeAlpha by animateFloatAsState(
+        targetValue = if (startAnimation) 1f else 0f,
+        animationSpec = tween(durationMillis = 800),
+        label = "fadeAnim"
+    )
+
+    // ─── ANIMAÇÃO DA ESTRELA DE FAVORITO ─────────────────────────────────────
+    val starScale by animateFloatAsState(
+        targetValue = if (isFavorite) 1.3f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "starAnim"
+    )
 
     coach?.let { c ->
         Box(
@@ -56,7 +99,6 @@ fun CoachScreen(
                 .fillMaxSize()
                 .background(secondaryColor)
         ) {
-            // CAMADA DE ESMAECIMENTO DA TELA
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -67,10 +109,13 @@ fun CoachScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .systemBarsPadding()
+                    .graphicsLayer {
+                        alpha = fadeAlpha
+                        translationY = slideOffset.toPx()
+                    }
                     .verticalScroll(rememberScrollState())
                     .padding(24.dp)
             ) {
-                // 1. Barra Superior
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -80,9 +125,7 @@ fun CoachScreen(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Voltar",
                         tint = Color.White,
-                        modifier = Modifier
-                            .size(28.dp)
-                            .clickable { onBackClick() }
+                        modifier = Modifier.size(28.dp).clickable { onBackClick() }
                     )
 
                     Icon(
@@ -91,13 +134,25 @@ fun CoachScreen(
                         tint = if (isFavorite) Color(0xFFFFD700) else Color.White,
                         modifier = Modifier
                             .size(28.dp)
-                            .clickable { isFavorite = !isFavorite }
+                            .clickable {
+                                isFavorite = !isFavorite
+                                // Salva a escolha na memória do celular
+                                sharedPreferences.edit {
+                                    putBoolean(
+                                        "fav_coach_$teamId",
+                                        isFavorite
+                                    )
+                                }
+                            }
+                            .graphicsLayer {
+                                scaleX = starScale
+                                scaleY = starScale
+                            }
                     )
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // 2. Header: Foto e Informações
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
@@ -108,7 +163,7 @@ fun CoachScreen(
                             .height(210.dp)
                             .clip(RoundedCornerShape(12.dp))
                             .background(primaryColor)
-                            .background(Color.Black.copy(alpha = 0.25f)) // <-- ESMAECIMENTO DO FUNDO DA FOTO AQUI!
+                            .background(Color.Black.copy(alpha = 0.25f))
                     ) {
                         Image(
                             painter = painterResource(id = c.fotoResId),
@@ -121,43 +176,19 @@ fun CoachScreen(
                     Spacer(modifier = Modifier.width(20.dp))
 
                     Column {
-                        Text(
-                            text = c.nome.uppercase(),
-                            color = Color.White,
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            lineHeight = 26.sp
-                        )
+                        Text(text = c.nome.uppercase(), color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 26.sp)
                         Spacer(modifier = Modifier.height(12.dp))
-
                         team?.let {
-                            Text(
-                                text = it.nome.uppercase(),
-                                color = Color.White.copy(alpha = 0.9f),
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold
-                            )
+                            Text(text = it.nome.uppercase(), color = Color.White.copy(alpha = 0.9f), fontSize = 14.sp, fontWeight = FontWeight.Bold)
                         }
                         Spacer(modifier = Modifier.height(8.dp))
-
-                        Text(
-                            text = "${obterBandeiraEmoji(c.pais)} ${c.pais.uppercase()}",
-                            color = Color.White,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Text(text = "${obterBandeiraEmoji(c.pais)} ${c.pais.uppercase()}", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                     }
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // 3. Perfil
-                Text(
-                    text = "PERFIL",
-                    color = Color.White,
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 16.sp
-                )
+                Text(text = "PERFIL", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     text = c.perfil.replace("\n", " ").replace("  ", " "),
@@ -168,15 +199,11 @@ fun CoachScreen(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // 4. Linhas de Informações
                 InfoWhiteRow(icon = obterBandeiraEmoji(c.pais), label = "PAÍS", value = c.pais)
                 Spacer(modifier = Modifier.height(8.dp))
 
                 val escudoDoTime = painterResource(id = FotoMap.timeFoto(team?.nome ?: ""))
                 InfoWhiteRowImage(painter = escudoDoTime, label = "TIME ATUAL", value = team?.nome ?: "")
-                Spacer(modifier = Modifier.height(8.dp))
-
-                InfoWhiteRow(icon = "💬", label = "IDIOMA", value = c.idioma)
 
                 Spacer(modifier = Modifier.height(32.dp))
             }
