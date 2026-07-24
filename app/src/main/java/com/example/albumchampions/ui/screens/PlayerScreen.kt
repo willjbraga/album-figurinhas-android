@@ -4,14 +4,21 @@
 // ═════════════════════════════════════════════════════════════════════════════
 package com.example.albumchampions.ui.screens
 
+import android.content.Context
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -29,9 +36,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -40,6 +49,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.albumchampions.data.remote.FotoMap
 import com.example.albumchampions.viewmodel.PlayerViewModel
+import kotlinx.coroutines.delay
+import androidx.core.content.edit
 
 @Composable
 fun PlayerScreen(
@@ -54,34 +65,62 @@ fun PlayerScreen(
 
     val primaryColor = team?.corPrimaria?.toComposeColor() ?: Color(0xFF1A237E)
     val secondaryColor = team?.corSecundaria?.toComposeColor() ?: Color(0xFF0A0E27)
-
     val corTextoCamisa = if (primaryColor.luminance() > 0.5f) Color(0xFF0A0E27) else Color.White
 
-    var isFavorite by remember { mutableStateOf(false) }
+    // ─── MEMÓRIA LOCAL PARA FAVORITOS (SharedPreferences) ────────────────────
+    val context = LocalContext.current
+    val sharedPreferences = remember { context.getSharedPreferences("AlbumPrefs", Context.MODE_PRIVATE) }
+    var isFavorite by remember {
+        mutableStateOf(sharedPreferences.getBoolean("fav_player_$playerName", false))
+    }
 
-    // ─── LÓGICA DE ANIMAÇÃO (AURA) ──────────────────────────────────────────
-    // Cria a transição infinita para os jogadores destaque
+    // ─── ESTADOS DE ANIMAÇÃO DE ENTRADA ──────────────────────────────────────
+    var startAnimation by remember { mutableStateOf(false) }
+
+    LaunchedEffect(player, team) {
+        if (player != null && team != null) {
+            delay(150)
+            startAnimation = true
+        }
+    }
+
+    val slideOffset by animateDpAsState(
+        targetValue = if (startAnimation) 0.dp else 50.dp,
+        animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing),
+        label = "slideAnim"
+    )
+    val fadeAlpha by animateFloatAsState(
+        targetValue = if (startAnimation) 1f else 0f,
+        animationSpec = tween(durationMillis = 800),
+        label = "fadeAnim"
+    )
+
+    // ─── ANIMAÇÃO DA ESTRELA DE FAVORITO ─────────────────────────────────────
+    val starScale by animateFloatAsState(
+        targetValue = if (isFavorite) 1.3f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "starAnim"
+    )
+
+    // ─── ANIMAÇÃO DA AURA ────────────────────────────────────────────────────
     val infiniteTransition = rememberInfiniteTransition(label = "aura")
     val auraAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.2f, // Brilho mais fraco
-        targetValue = 0.6f,  // Brilho mais forte
+        initialValue = 0.2f,
+        targetValue = 0.6f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 3500, easing = LinearEasing),
+            animation = tween(durationMillis = 3000, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "auraAlpha"
     )
-    // ─────────────────────────────────────────────────────────────────────────
 
     player?.let { p ->
-        // Degradê Dourado Sofisticado para o Card da Estrela
         val fundoDaFigurinha = if (p.estrela) {
             Brush.linearGradient(
-                colors = listOf(
-                    Color(0xFFD4AF37),
-                    Color(0xFFFFDF73),
-                    Color(0xFFDAA520)
-                )
+                colors = listOf(Color(0xFFD4AF37), Color(0xFFFFDF73), Color(0xFFDAA520))
             )
         } else {
             SolidColor(Color.White)
@@ -92,25 +131,16 @@ fun PlayerScreen(
                 .fillMaxSize()
                 .background(secondaryColor)
         ) {
-            // CAMADA DE ESMAECIMENTO (Overlay escuro)
             val alphaOverlay = if (p.estrela) 0.75f else 0.65f
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = alphaOverlay))
-            )
+            Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = alphaOverlay)))
 
-            // BRILHO DOURADO ANIMADO (Apenas para jogadores destaque)
             if (p.estrela) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
                             Brush.radialGradient(
-                                colors = listOf(
-                                    Color(0xFFFFD700).copy(alpha = auraAlpha), // <-- Usa o alpha animado aqui!
-                                    Color.Transparent
-                                ),
+                                colors = listOf(Color(0xFFFFD700).copy(alpha = auraAlpha), Color.Transparent),
                                 radius = 1200f
                             )
                         )
@@ -121,10 +151,13 @@ fun PlayerScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .systemBarsPadding()
+                    .graphicsLayer {
+                        alpha = fadeAlpha
+                        translationY = slideOffset.toPx()
+                    }
                     .verticalScroll(rememberScrollState())
                     .padding(24.dp)
             ) {
-                // Barra Superior
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -134,9 +167,7 @@ fun PlayerScreen(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Voltar",
                         tint = Color.White,
-                        modifier = Modifier
-                            .size(28.dp)
-                            .clickable { onBackClick() }
+                        modifier = Modifier.size(28.dp).clickable { onBackClick() }
                     )
 
                     Icon(
@@ -145,13 +176,25 @@ fun PlayerScreen(
                         tint = if (isFavorite) Color(0xFFFFD700) else Color.White,
                         modifier = Modifier
                             .size(28.dp)
-                            .clickable { isFavorite = !isFavorite }
+                            .clickable {
+                                isFavorite = !isFavorite
+                                // Salva a escolha na memória do celular na hora!
+                                sharedPreferences.edit {
+                                    putBoolean(
+                                        "fav_player_$playerName",
+                                        isFavorite
+                                    )
+                                }
+                            }
+                            .graphicsLayer {
+                                scaleX = starScale
+                                scaleY = starScale
+                            }
                     )
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Header: Foto (Carta) e Informações
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
@@ -170,100 +213,54 @@ fun PlayerScreen(
                             contentScale = ContentScale.Crop
                         )
 
-                        // Estrela no canto
                         if (p.estrela) {
                             Icon(
                                 imageVector = Icons.Filled.Star,
                                 contentDescription = "Jogador Destaque",
                                 tint = Color(0xFFB8860B),
-                                modifier = Modifier
-                                    .align(Alignment.TopEnd)
-                                    .padding(8.dp)
-                                    .size(24.dp)
+                                modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).size(24.dp)
                             )
                         }
 
-                        // Etiqueta da camisa
+                        // ─── NÚMERO DA CAMISA COM BORDAS SUTIS ───
                         Box(
                             modifier = Modifier
                                 .background(
                                     color = primaryColor,
                                     shape = RoundedCornerShape(bottomEnd = 8.dp)
                                 )
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Black.copy(alpha = 0.2f), // A bordinha leve aqui!
+                                    shape = RoundedCornerShape(bottomEnd = 8.dp)
+                                )
                                 .padding(horizontal = 10.dp, vertical = 6.dp)
                         ) {
-                            Text(
-                                text = "${p.numCamisa}",
-                                color = corTextoCamisa,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp
-                            )
+                            Text(text = "${p.numCamisa}", color = corTextoCamisa, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         }
                     }
 
                     Spacer(modifier = Modifier.width(20.dp))
 
                     Column {
-                        Text(
-                            text = p.nome.uppercase(),
-                            color = Color.White,
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            lineHeight = 26.sp
-                        )
+                        Text(text = p.nome.uppercase(), color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 26.sp)
                         team?.let {
-                            Text(
-                                text = it.nome.uppercase(),
-                                color = Color.White.copy(alpha = 0.8f),
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
+                            Text(text = it.nome.uppercase(), color = Color.White.copy(alpha = 0.8f), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                         }
                         Spacer(modifier = Modifier.height(12.dp))
-
-                        Text(
-                            text = "${obterBandeiraEmoji(p.pais)} ${p.pais.uppercase()}",
-                            color = Color.White,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        Text(
-                            text = p.posicao.uppercase(),
-                            color = Color.White.copy(alpha = 0.7f),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium
-                        )
+                        Text(text = "${obterBandeiraEmoji(p.pais)} ${p.pais.uppercase()}", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                     }
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Sobre o Jogador
-                Text(
-                    text = "SOBRE O JOGADOR",
-                    color = Color.White,
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 16.sp
-                )
+                Text(text = "SOBRE O JOGADOR", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
                 Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    text = p.sobre,
-                    color = Color.White.copy(alpha = 0.8f),
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp
-                )
+                Text(text = p.sobre, color = Color.White.copy(alpha = 0.8f), fontSize = 14.sp, lineHeight = 20.sp)
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Estatísticas
-                Text(
-                    text = "ESTATÍSTICAS (2025/2026)",
-                    color = Color.White,
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 16.sp
-                )
+                Text(text = "ESTATÍSTICAS (2025/2026)", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -276,7 +273,6 @@ fun PlayerScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Linhas de Informações Inferiores
                 InfoWhiteRow(icon = "👕", label = "NÚMERO DA CAMISA", value = "${p.numCamisa}")
                 Spacer(modifier = Modifier.height(8.dp))
                 InfoWhiteRow(icon = obterBandeiraEmoji(p.pais), label = "PAÍS", value = p.pais)
@@ -294,7 +290,6 @@ fun PlayerScreen(
 }
 
 // ─── FUNÇÕES AUXILIARES ─────────────────────────────────────────────────────
-
 fun obterBandeiraEmoji(pais: String): String {
     return when (pais.lowercase().trim()) {
         "brasil" -> "🇧🇷"
@@ -326,27 +321,13 @@ fun StatWhiteCard(modifier: Modifier = Modifier, label: String, value: String) {
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 2.dp),
+            modifier = Modifier.fillMaxSize().padding(horizontal = 2.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = label,
-                color = Color(0xFF0A0E27),
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            Text(text = label, color = Color(0xFF0A0E27), fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = value,
-                color = Color(0xFF0A0E27),
-                fontSize = 26.sp,
-                fontWeight = FontWeight.ExtraBold
-            )
+            Text(text = value, color = Color(0xFF0A0E27), fontSize = 26.sp, fontWeight = FontWeight.ExtraBold)
         }
     }
 }
@@ -360,9 +341,7 @@ fun InfoWhiteRow(icon: String, label: String, value: String) {
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -385,18 +364,12 @@ fun InfoWhiteRowImage(painter: Painter, label: String, value: String) {
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    painter = painter,
-                    contentDescription = "Escudo",
-                    modifier = Modifier.size(20.dp)
-                )
+                Image(painter = painter, contentDescription = "Escudo", modifier = Modifier.size(20.dp))
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(text = label, color = Color(0xFF0A0E27), fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
             }

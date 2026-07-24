@@ -22,8 +22,7 @@ fun PlayerDto.toPlayer() = Player(
     assistencia = assistencia,
     sobre = sobre,
     idTime = idTime,
-    fotoResId = FotoMap.jogadorFoto(nome),
-    posicao = "ATACANTE"
+    fotoResId = FotoMap.jogadorFoto(nome)
 )
 
 fun CoachDto.toCoach() = Coach(
@@ -31,8 +30,7 @@ fun CoachDto.toCoach() = Coach(
     perfil = perfil,
     pais = pais,
     idTime = idTime,
-    fotoResId = FotoMap.treinadorFoto(nome),
-    idioma = "Alemão"
+    fotoResId = FotoMap.treinadorFoto(nome)
 )
 
 fun CompetitionDto.toCompetition() = Competition(
