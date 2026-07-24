@@ -120,6 +120,14 @@ fun PlayerScreen(
         label = "auraAlpha"
     )
 
+    // ─── ESTADO E ANIMAÇÃO DO GIRO DA CARTA ─────────────────────────────────
+    var isFlipped by remember { mutableStateOf(false) }
+    val flipRotation by animateFloatAsState(
+        targetValue = if (isFlipped) 180f else 0f,
+        animationSpec = tween(durationMillis = 600, easing = FastOutSlowInEasing),
+        label = "flipAnim"
+    )
+
     player?.let { p ->
         val fundoDaFigurinha = if (p.estrela) {
             Brush.linearGradient(
@@ -202,46 +210,92 @@ fun PlayerScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+
+                    // ─── COMPONENTE DA CARTA COM LÓGICA DE GIRO (FLIP) ───
                     Box(
                         modifier = Modifier
                             .width(150.dp)
                             .height(210.dp)
+                            .graphicsLayer {
+                                rotationY = flipRotation
+                                cameraDistance = 12f * density
+                            }
+                            .clickable { isFlipped = !isFlipped }
                             .clip(RoundedCornerShape(12.dp))
-                            .background(fundoDaFigurinha)
                     ) {
-                        Image(
-                            painter = painterResource(id = p.fotoResId),
-                            contentDescription = "Foto ${p.nome}",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
-
-                        if (p.estrela) {
-                            Icon(
-                                imageVector = Icons.Filled.Star,
-                                contentDescription = "Jogador Destaque",
-                                tint = Color(0xFFB8860B),
-                                modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).size(24.dp)
-                            )
-                        }
-
-                        // ─── NÚMERO DA CAMISA COM BORDAS SUTIS ───
-                        Box(
-                            modifier = Modifier
-                                .background(
-                                    color = primaryColor,
-                                    shape = RoundedCornerShape(bottomEnd = 8.dp)
+                        if (flipRotation <= 90f) {
+                            // FRENTE DA CARTA
+                            Box(modifier = Modifier.fillMaxSize().background(fundoDaFigurinha)) {
+                                Image(
+                                    painter = painterResource(id = p.fotoResId),
+                                    contentDescription = "Foto ${p.nome}",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
                                 )
-                                .border(
-                                    width = 1.dp,
-                                    color = Color.Black.copy(alpha = 0.2f), // A bordinha leve aqui!
-                                    shape = RoundedCornerShape(bottomEnd = 8.dp)
-                                )
-                                .padding(horizontal = 10.dp, vertical = 6.dp)
-                        ) {
-                            Text(text = "${p.numCamisa}", color = corTextoCamisa, fontWeight = FontWeight.Bold, fontFamily = FrauncesFontR, fontSize = 18.sp)
+
+                                if (p.estrela) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Star,
+                                        contentDescription = "Jogador Destaque",
+                                        tint = Color(0xFFB8860B),
+                                        modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).size(24.dp)
+                                    )
+                                }
+
+                                // ─── NÚMERO DA CAMISA COM BORDAS SUTIS ───
+                                Box(
+                                    modifier = Modifier
+                                        .background(
+                                            color = primaryColor,
+                                            shape = RoundedCornerShape(bottomEnd = 8.dp)
+                                        )
+                                        .border(
+                                            width = 1.dp,
+                                            color = Color.Black.copy(alpha = 0.2f), // A bordinha leve aqui!
+                                            shape = RoundedCornerShape(bottomEnd = 8.dp)
+                                        )
+                                        .padding(horizontal = 10.dp, vertical = 6.dp)
+                                ) {
+                                    Text(text = "${p.numCamisa}", color = corTextoCamisa, fontWeight = FontWeight.Bold, fontFamily = FrauncesFontR, fontSize = 18.sp)
+                                }
+                            }
+                        } else {
+                            // VERSO DA CARTA (COM O TROFÉU)
+                            val fundoVerso = if (p.estrela) {
+                                Brush.radialGradient(colors = listOf(Color(0xFFDAA520), Color(0xFF8B6508)), radius = 500f)
+                            } else {
+                                Brush.radialGradient(colors = listOf(Color(0xFF3A4A6A), Color(0xFF0A0E27)), radius = 600f)
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .graphicsLayer { rotationY = 180f } // Desfaz o espelhamento
+                                    .background(fundoVerso),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    // AQUI ENTRA O TROFÉU!
+                                    Image(
+                                        painter = painterResource(id = R.drawable.trofeuc),
+                                        contentDescription = "Troféu da Champions",
+                                        modifier = Modifier.size(120.dp),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    Text(
+                                        text = "CHAMPIONS",
+                                        color = if (p.estrela) Color.White else Color(0xFFD4AF37),
+                                        fontSize = 14.sp,
+                                        fontFamily = FrauncesFont,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        letterSpacing = 2.sp
+                                    )
+                                }
+                            }
                         }
                     }
+                    // ───────────────────────────────────────────────────────
 
                     Spacer(modifier = Modifier.width(20.dp))
 

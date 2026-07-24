@@ -27,6 +27,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -96,6 +97,14 @@ fun CoachScreen(
         label = "starAnim"
     )
 
+    // ─── ESTADO E ANIMAÇÃO DO GIRO DA CARTA ─────────────────────────────────
+    var isFlipped by remember { mutableStateOf(false) }
+    val flipRotation by animateFloatAsState(
+        targetValue = if (isFlipped) 180f else 0f,
+        animationSpec = tween(durationMillis = 600, easing = FastOutSlowInEasing),
+        label = "flipAnim"
+    )
+
     coach?.let { c ->
         Box(
             modifier = Modifier
@@ -160,21 +169,68 @@ fun CoachScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    // ─── COMPONENTE DA CARTA COM LÓGICA DE GIRO (FLIP) ───
                     Box(
                         modifier = Modifier
                             .width(150.dp)
                             .height(210.dp)
+                            .graphicsLayer {
+                                rotationY = flipRotation
+                                cameraDistance = 12f * density
+                            }
+                            .clickable { isFlipped = !isFlipped }
                             .clip(RoundedCornerShape(12.dp))
-                            .background(primaryColor)
-                            .background(Color.Black.copy(alpha = 0.25f))
                     ) {
-                        Image(
-                            painter = painterResource(id = c.fotoResId),
-                            contentDescription = "Foto ${c.nome}",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
+                        if (flipRotation <= 90f) {
+                            // FRENTE DA CARTA
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(primaryColor)
+                                    .background(Color.Black.copy(alpha = 0.25f))
+                            ) {
+                                Image(
+                                    painter = painterResource(id = c.fotoResId),
+                                    contentDescription = "Foto ${c.nome}",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+                        } else {
+                            // VERSO DA CARTA (COM O TROFÉU)
+                            val fundoVerso = Brush.radialGradient(
+                                colors = listOf(Color(0xFF3A4A6A), Color(0xFF0A0E27)),
+                                radius = 600f
+                            )
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .graphicsLayer { rotationY = 180f } // Desfaz o espelhamento
+                                    .background(fundoVerso),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.trofeuc),
+                                        contentDescription = "Troféu da Champions",
+                                        modifier = Modifier.size(120.dp),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    Text(
+                                        text = "CHAMPIONS",
+                                        color = Color(0xFFD4AF37), // Texto Dourado
+                                        fontSize = 14.sp,
+                                        fontFamily = FrauncesFont,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        letterSpacing = 2.sp
+                                    )
+                                }
+                            }
+                        }
                     }
+                    // ───────────────────────────────────────────────────────
 
                     Spacer(modifier = Modifier.width(20.dp))
 

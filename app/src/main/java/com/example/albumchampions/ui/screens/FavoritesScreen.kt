@@ -20,9 +20,11 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -175,7 +177,7 @@ fun FavoriteCoachItem(teamId: Int, onClick: () -> Unit) {
 fun FavoritePlayerGridCard(player: Player, badgeColor: Color, onClick: () -> Unit) {
     val isStar = player.estrela
     val containerBg = if (isStar) Color(0xFFFFF7C2) else Color.White
-    val borderColor = if (isStar) Color(0xFFFFD700) else Color(0xFF1A237E)
+    val borderColor = if (isStar) Color(0xFFFFD700) else badgeColor
 
     Card(
         modifier = Modifier
@@ -194,11 +196,22 @@ fun FavoritePlayerGridCard(player: Player, badgeColor: Color, onClick: () -> Uni
                     contentScale = ContentScale.Crop
                 )
 
+                // Número do jogador — texto e borda com contraste automático,
+                // igual ao ajuste feito no TeamAlbumScreen, para não sumir quando
+                // a cor dinâmica do time for clara (branco/amarelo claro).
+                val badgeIsLight = badgeColor.luminance() > 0.5f
+                val numberTextColor = if (badgeIsLight) Color.Black else Color.White
+                val badgeBorderColor = if (badgeIsLight) Color.Black.copy(alpha = 0.25f) else Color.Black.copy(alpha = 0.15f)
+
                 Box(
-                    modifier = Modifier.padding(4.dp).size(22.dp).background(badgeColor, CircleShape),
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .size(22.dp)
+                        .background(badgeColor, CircleShape)
+                        .border(1.dp, badgeBorderColor, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("${player.numCamisa}", color = Color.White, fontSize = 11.sp, fontFamily = FrauncesFont, fontWeight = FontWeight.Bold)
+                    Text("${player.numCamisa}", color = numberTextColor, fontSize = 11.sp, fontFamily = FrauncesFont, fontWeight = FontWeight.Bold)
                 }
 
                 if (isStar) {
@@ -234,7 +247,11 @@ fun FavoriteCoachCard(coach: Coach, onClick: () -> Unit) {
                 painter = painterResource(id = coach.fotoResId),
                 contentDescription = "Foto ${coach.nome}",
                 modifier = Modifier.width(110.dp).height(95.dp).clip(RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp)),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                // Mesmo ajuste aplicado no TeamAlbumScreen: ancora o corte pelo topo da foto
+                // para não cortar a cabeça do treinador. Usando -1f (topo total), como você
+                // ajustou por lá. Se ficar "top demais" aqui, é só reduzir um pouco (ex.: -0.8f).
+                alignment = BiasAlignment(horizontalBias = 0f, verticalBias = -1f)
             )
 
             Spacer(modifier = Modifier.width(16.dp))

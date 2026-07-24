@@ -19,13 +19,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -59,7 +59,6 @@ fun TeamAlbumScreen(
     val isLoading by viewModel.isLoading.collectAsState()
 
     // Estado do favorito para a estrela na TopBar
-    var isFavorite by remember { mutableStateOf(false) }
 
     // Cores do time vindas do banco
     val primaryColor   = team?.corPrimaria?.toComposeColor()   ?: Color(0xFF1A237E)
@@ -92,15 +91,6 @@ fun TeamAlbumScreen(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Voltar",
                             tint = Color.White
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { isFavorite = !isFavorite }) {
-                        Icon(
-                            imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
-                            contentDescription = "Favorito",
-                            tint = if (isFavorite) Color(0xFFFFD700) else Color.White
                         )
                     }
                 },
@@ -271,7 +261,12 @@ private fun CoachCardCustom(coach: Coach, onClick: () -> Unit) {
                     .width(110.dp)
                     .height(95.dp)
                     .clip(RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp)),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                // Ancora o corte mais para cima da imagem, "descendo" a foto dentro do quadro
+                // e evitando que o rosto/cabeça do treinador seja cortado.
+                // Se ainda cortar demais (ou de menos), ajuste o verticalBias:
+                // -1f = topo total, 0f = centro, 1f = base total.
+                alignment = androidx.compose.ui.BiasAlignment(horizontalBias = 0f, verticalBias = -1f)
             )
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -314,7 +309,7 @@ private fun PlayerGridCard(
 ) {
     val isStar = player.estrela
     val containerBg = if (isStar) Color(0xFFFFF7C2) else Color.White
-    val borderColor = if (isStar) Color(0xFFFFD700) else Color(0xFF1A237E)
+    val borderColor = if (isStar) Color(0xFFFFD700) else badgeColor
 
     Card(
         modifier = Modifier
@@ -337,16 +332,25 @@ private fun PlayerGridCard(
                 )
 
                 // Número do jogador
+                // Se a cor dinâmica do time for clara (ex.: branco/amarelo claro), o texto branco
+                // "some" em cima dela. Aqui escolhemos automaticamente texto preto ou branco
+                // com base na luminância da cor, e adicionamos uma borda sutil para o badge
+                // continuar visível mesmo quando a cor for quase igual à do card (branco).
+                val badgeIsLight = badgeColor.luminance() > 0.5f
+                val numberTextColor = if (badgeIsLight) Color.Black else Color.White
+                val badgeBorderColor = if (badgeIsLight) Color.Black.copy(alpha = 0.25f) else Color.Black.copy(alpha = 0.15f)
+
                 Box(
                     modifier = Modifier
                         .padding(4.dp)
                         .size(22.dp)
-                        .background(badgeColor, CircleShape),
+                        .background(badgeColor, CircleShape)
+                        .border(1.dp, badgeBorderColor, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "${player.numCamisa}",
-                        color = Color.White,
+                        color = numberTextColor,
                         fontSize = 11.sp,
                         fontFamily = FrauncesFont,
                         fontWeight = FontWeight.Bold
@@ -402,6 +406,10 @@ private fun getCountryFlag(countryName: String): String {
         "brasil" -> "🇧🇷"
         "argentina" -> "🇦🇷"
         "holanda", "países baixos" -> "🇳🇱"
+        "bélgica", "belgica" -> "🇧🇪"
+        "croácia", "croacia" -> "🇭🇷"
+        "uruguai" -> "🇺🇾"
+        "polônia", "polonia" -> "🇵🇱"
         else -> "🏳️"
     }
 }

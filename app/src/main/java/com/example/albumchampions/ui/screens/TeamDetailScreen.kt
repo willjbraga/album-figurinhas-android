@@ -13,7 +13,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,9 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.albumchampions.viewmodel.TeamViewModel
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import com.example.albumchampions.R
+import androidx.core.graphics.toColorInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +37,6 @@ fun TeamDetailScreen(
     LaunchedEffect(teamId) { viewModel.loadTeam(teamId) }
 
     val team by viewModel.team.collectAsState()
-    var isFavorite by remember { mutableStateOf(false) }
 
     // Conversão direta da cor do banco para Color do Compose
     val secondaryColor = when (team?.nome?.lowercase()) {
@@ -61,15 +57,6 @@ fun TeamDetailScreen(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Voltar",
                             tint = Color.White
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { isFavorite = !isFavorite }) {
-                        Icon(
-                            imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
-                            contentDescription = "Favorito",
-                            tint = if (isFavorite) Color(0xFFFFD700) else Color.White
                         )
                     }
                 },
@@ -266,7 +253,7 @@ private fun InfoRowItem(
 private fun parseHexColor(hex: String?, default: Color): Color {
     if (hex.isNullOrEmpty()) return default
     return try {
-        Color(android.graphics.Color.parseColor(hex))
+        Color(hex.toColorInt())
     } catch (_: Exception) {
         default
     }
