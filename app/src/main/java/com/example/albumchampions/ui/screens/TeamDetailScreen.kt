@@ -26,6 +26,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.albumchampions.viewmodel.TeamViewModel
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import com.example.albumchampions.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,6 +101,7 @@ fun TeamDetailScreen(
                     text = t.nome.uppercase(),
                     color = Color.White,
                     fontSize = 22.sp,
+                    fontFamily = FrauncesFont,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 2.sp
                 )
@@ -108,6 +112,7 @@ fun TeamDetailScreen(
                     text = t.sigla.uppercase(),
                     color = Color.White.copy(alpha = 0.9f),
                     fontSize = 16.sp,
+                    fontFamily = FrauncesFont,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp
                 )
@@ -154,6 +159,7 @@ fun TeamDetailScreen(
                         text = "HISTÓRIA",
                         color = Color.White,
                         fontSize = 16.sp,
+                        fontFamily = FrauncesFont,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp
                     )
@@ -162,6 +168,7 @@ fun TeamDetailScreen(
                         text = t.historia,
                         color = Color.White.copy(alpha = 0.85f),
                         fontSize = 14.sp,
+                        fontFamily = FrauncesFontR,
                         lineHeight = 20.sp
                     )
                 }
@@ -175,6 +182,7 @@ fun TeamDetailScreen(
                         color = Color.White,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
+                        fontFamily = FrauncesFont,
                         letterSpacing = 1.sp
                     )
                     Spacer(Modifier.height(8.dp))
@@ -182,6 +190,7 @@ fun TeamDetailScreen(
                         text = t.curiosidade,
                         color = Color.White.copy(alpha = 0.85f),
                         fontSize = 14.sp,
+                        fontFamily = FrauncesFontL,
                         lineHeight = 20.sp
                     )
                 }
@@ -231,6 +240,7 @@ private fun InfoRowItem(
                     color = Color.Black,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
+                    fontFamily = FrauncesFontR,
                     letterSpacing = 0.5.sp
                 )
             }
@@ -244,6 +254,7 @@ private fun InfoRowItem(
                     text = value,
                     color = Color.Black,
                     fontSize = 13.sp,
+                    fontFamily = FrauncesFont,
                     fontWeight = FontWeight.Bold
                 )
             }

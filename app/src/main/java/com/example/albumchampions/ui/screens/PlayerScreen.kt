@@ -51,6 +51,9 @@ import com.example.albumchampions.data.remote.FotoMap
 import com.example.albumchampions.viewmodel.PlayerViewModel
 import kotlinx.coroutines.delay
 import androidx.core.content.edit
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import com.example.albumchampions.R
 
 @Composable
 fun PlayerScreen(
@@ -236,31 +239,31 @@ fun PlayerScreen(
                                 )
                                 .padding(horizontal = 10.dp, vertical = 6.dp)
                         ) {
-                            Text(text = "${p.numCamisa}", color = corTextoCamisa, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                            Text(text = "${p.numCamisa}", color = corTextoCamisa, fontWeight = FontWeight.Bold, fontFamily = FrauncesFontR, fontSize = 18.sp)
                         }
                     }
 
                     Spacer(modifier = Modifier.width(20.dp))
 
                     Column {
-                        Text(text = p.nome.uppercase(), color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 26.sp)
+                        Text(text = p.nome.uppercase(), color = Color.White, fontSize = 22.sp, fontFamily = FrauncesFontR, fontWeight = FontWeight.ExtraBold, lineHeight = 26.sp)
                         team?.let {
-                            Text(text = it.nome.uppercase(), color = Color.White.copy(alpha = 0.8f), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                            Text(text = it.nome.uppercase(), color = Color.White.copy(alpha = 0.8f), fontSize = 14.sp, fontFamily = FrauncesFontR, fontWeight = FontWeight.SemiBold)
                         }
                         Spacer(modifier = Modifier.height(12.dp))
-                        Text(text = "${obterBandeiraEmoji(p.pais)} ${p.pais.uppercase()}", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                        Text(text = "${obterBandeiraEmoji(p.pais)} ${p.pais.uppercase()}", color = Color.White, fontSize = 14.sp, fontFamily = FrauncesFontR, fontWeight = FontWeight.Bold)
                     }
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                Text(text = "SOBRE O JOGADOR", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+                Text(text = "SOBRE O JOGADOR", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, fontFamily = FrauncesFont)
                 Spacer(modifier = Modifier.height(12.dp))
-                Text(text = p.sobre, color = Color.White.copy(alpha = 0.8f), fontSize = 14.sp, lineHeight = 20.sp)
+                Text(text = p.sobre, color = Color.White.copy(alpha = 0.8f), fontSize = 14.sp, fontFamily = FrauncesFontL, lineHeight = 20.sp)
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                Text(text = "ESTATÍSTICAS (2025/2026)", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+                Text(text = "ESTATÍSTICAS (2025/2026)", color = Color.White, fontWeight = FontWeight.ExtraBold, fontFamily = FrauncesFont, fontSize = 16.sp)
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -325,9 +328,9 @@ fun StatWhiteCard(modifier: Modifier = Modifier, label: String, value: String) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = label, color = Color(0xFF0A0E27), fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(text = label, color = Color(0xFF0A0E27), fontSize = 13.sp, fontWeight = FontWeight.Bold, fontFamily = FrauncesFontR, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = value, color = Color(0xFF0A0E27), fontSize = 26.sp, fontWeight = FontWeight.ExtraBold)
+            Text(text = value, color = Color(0xFF0A0E27), fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, fontFamily = FrauncesFont)
         }
     }
 }
@@ -346,11 +349,11 @@ fun InfoWhiteRow(icon: String, label: String, value: String) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = icon, fontSize = 18.sp)
+                Text(text = icon, fontSize = 18.sp, fontFamily = FrauncesFontR)
                 Spacer(modifier = Modifier.width(12.dp))
-                Text(text = label, color = Color(0xFF0A0E27), fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                Text(text = label, color = Color(0xFF0A0E27), fontSize = 12.sp, fontFamily = FrauncesFontR, fontWeight = FontWeight.SemiBold)
             }
-            Text(text = value, color = Color(0xFF0A0E27), fontSize = 14.sp, fontWeight = FontWeight.ExtraBold)
+            Text(text = value, color = Color(0xFF0A0E27), fontSize = 14.sp, fontFamily = FrauncesFont, fontWeight = FontWeight.ExtraBold)
         }
     }
 }
@@ -371,9 +374,9 @@ fun InfoWhiteRowImage(painter: Painter, label: String, value: String) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(painter = painter, contentDescription = "Escudo", modifier = Modifier.size(20.dp))
                 Spacer(modifier = Modifier.width(12.dp))
-                Text(text = label, color = Color(0xFF0A0E27), fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                Text(text = label, color = Color(0xFF0A0E27), fontSize = 12.sp, fontFamily = FrauncesFontR, fontWeight = FontWeight.SemiBold)
             }
-            Text(text = value, color = Color(0xFF0A0E27), fontSize = 14.sp, fontWeight = FontWeight.ExtraBold)
+            Text(text = value, color = Color(0xFF0A0E27), fontSize = 14.sp, fontFamily = FrauncesFont, fontWeight = FontWeight.ExtraBold)
         }
     }
 }

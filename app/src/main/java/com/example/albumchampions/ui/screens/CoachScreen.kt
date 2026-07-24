@@ -40,6 +40,9 @@ import com.example.albumchampions.data.remote.FotoMap
 import com.example.albumchampions.viewmodel.CoachViewModel
 import kotlinx.coroutines.delay
 import androidx.core.content.edit
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import com.example.albumchampions.R
 
 @Composable
 fun CoachScreen(
@@ -176,24 +179,25 @@ fun CoachScreen(
                     Spacer(modifier = Modifier.width(20.dp))
 
                     Column {
-                        Text(text = c.nome.uppercase(), color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 26.sp)
+                        Text(text = c.nome.uppercase(), color = Color.White, fontSize = 22.sp, fontFamily = FrauncesFont, fontWeight = FontWeight.ExtraBold, lineHeight = 26.sp)
                         Spacer(modifier = Modifier.height(12.dp))
                         team?.let {
-                            Text(text = it.nome.uppercase(), color = Color.White.copy(alpha = 0.9f), fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                            Text(text = it.nome.uppercase(), color = Color.White.copy(alpha = 0.9f), fontFamily = FrauncesFont, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                         }
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(text = "${obterBandeiraEmoji(c.pais)} ${c.pais.uppercase()}", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                        Text(text = "${obterBandeiraEmoji(c.pais)} ${c.pais.uppercase()}", color = Color.White, fontFamily = FrauncesFont, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                     }
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                Text(text = "PERFIL", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+                Text(text = "PERFIL", color = Color.White, fontWeight = FontWeight.ExtraBold, fontFamily = FrauncesFont, fontSize = 16.sp)
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     text = c.perfil.replace("\n", " ").replace("  ", " "),
                     color = Color.White.copy(alpha = 0.8f),
                     fontSize = 14.sp,
+                    fontFamily = FrauncesFontL,
                     lineHeight = 20.sp
                 )
 
