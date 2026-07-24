@@ -11,6 +11,7 @@ import com.example.albumchampions.ui.screens.*
 // ── Rotas ────────────────────────────────────────────────────────────────────
 sealed class Screen(val route: String) {
     object Home       : Screen("home")
+    object Favorites  : Screen("favorites") // <--- ROTA NOVA ADICIONADA AQUI
     object TeamAlbum  : Screen("team_album/{teamId}") {
         fun createRoute(teamId: Int) = "team_album/$teamId"
     }
@@ -36,7 +37,17 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
             HomeScreen(
                 onTeamClick = { teamId ->
                     navController.navigate(Screen.TeamAlbum.createRoute(teamId))
+                },
+                onFavoritesClick = {
+                    navController.navigate(Screen.Favorites.route)
                 }
+            )
+        }
+        composable(Screen.Favorites.route) {
+            FavoritesScreen(
+                onPlayerClick = { playerName -> navController.navigate(Screen.Player.createRoute(playerName)) },
+                onCoachClick = { teamId -> navController.navigate(Screen.Coach.createRoute(teamId)) },
+                onBackClick = { navController.popBackStack() }
             )
         }
 
